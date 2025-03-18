@@ -45,13 +45,15 @@ public class SecurityConfiguration {
         http.csrf(AbstractHttpConfigurer::disable)
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(au -> au.requestMatchers(
-                                        HttpMethod.POST, "/api/v1/signin", "/api/v1/signup"
-                                )
+                        HttpMethod.POST, "/api/v1/signin", "/api/v1/signup"
 
-                                .permitAll()
-                                .requestMatchers(HttpMethod.GET, "/api/v1/public").permitAll()
+                                ).permitAll()
+                        .requestMatchers(HttpMethod.GET, "/api/v1/public").permitAll()
+                        .requestMatchers(HttpMethod.GET,  "/api/v1/authenticated").authenticated()
                                 .anyRequest().authenticated()
-                ).authenticationProvider(authenticationProvider())
+                )
+
+                .authenticationProvider(authenticationProvider())
                 .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
         return http.build();
 

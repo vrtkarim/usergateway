@@ -14,7 +14,7 @@ import java.util.Map;
 import java.util.function.Function;
 @Service
 public class JwtService {
-    String key = "this is my fucking key to secure my fucking api";
+    String key = "thisismyfuckingkeytosecuremyfuckingffffffffffffffffffapi";
     public String extractEmail(String  token ){
         return extractClaim(token, Claims::getSubject);
     }
