@@ -7,6 +7,7 @@ import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -28,11 +29,11 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     final private JwtService jwtService;
     private final UserService userService;
     @Override
-    protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
+    protected void doFilterInternal(@NonNull HttpServletRequest request, @NonNull HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
         final String authHeader = request.getHeader("Authorization");
         final String jwt;
         final String email;
-        if (authHeader.isEmpty() || !authHeader.startsWith("Bearer ")) {
+        if (authHeader==null || !authHeader.startsWith("Bearer ")) {
             filterChain.doFilter(request, response);
             return;
         }
@@ -40,21 +41,26 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         email = jwtService.extractEmail(jwt);
         if (!email.isEmpty()  && SecurityContextHolder.getContext().getAuthentication() ==null) {
             UserDetails userDetails = userService.userDetailsService().loadUserByUsername(email);
-            if (
-                    jwtService.isTokenValid(jwt, userDetails)
-            ){
-                SecurityContext securityContext =  SecurityContextHolder.createEmptyContext();
+            if (jwtService.isTokenValid(jwt, userDetails)){
+                SecurityContext securityContext = SecurityContextHolder.createEmptyContext();
                 UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(
                         userDetails, null, userDetails.getAuthorities()
                 );
+                System.out.println(userDetails.getAuthorities());
                 authenticationToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
                 securityContext.setAuthentication(authenticationToken);
-                filterChain.doFilter(request, response);
+
+                SecurityContextHolder.setContext(securityContext);
+
+
 
 
                 }
             }
+        filterChain.doFilter(request, response);
+
         }
+
 
     }
 
