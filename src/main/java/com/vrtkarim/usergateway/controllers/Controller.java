@@ -12,6 +12,8 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
+import java.security.Principal;
+
 @RequiredArgsConstructor
 @RestController
 @RequestMapping("/api/v1")
@@ -30,9 +32,9 @@ public class Controller {
     public ResponseEntity<String> publicEndpoint() {
         return new ResponseEntity<>("hello tous le monde", HttpStatus.OK);
     }
-    @GetMapping("/x")
+    @GetMapping("/authenticated")
     @PreAuthorize("hasRole('user')")
     public ResponseEntity<String> authenticatedEndpoint() {
-        return new ResponseEntity<>("hello authenticated user", HttpStatus.OK);
+        return new ResponseEntity<>("hello authenticated user ", HttpStatus.OK);
     }
 }
